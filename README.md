@@ -1,6 +1,6 @@
 # 🎮 VoxelCrime World - Complete Edition
 
-> Open-world voxel game mixing Minecraft's building, GTA's action, and Ananta's features. Now with Firebase integration!
+> Open-world voxel game mixing Minecraft's building, GTA's action, and Ananta's features. Now with **Supabase** (open-source Firebase alternative)!
 
 ![VoxelCrime World](https://via.placeholder.com/800x400/1a1a2e/ffd93d?text=VoxelCrime+World)
 
@@ -34,50 +34,20 @@ npm run dev
 | 1-5 | Select hotbar item |
 | ESC | Unlock mouse |
 
-## 🔥 Features (All Phases Complete!)
+## 🔥 Features
 
-### Phase 1: Foundation ✅
-- Voxel world with chunk-based rendering
-- Procedural city generation
-- Player movement & camera controls
-- HUD with health, minimap, hotbar
-
-### Phase 2: World & Building ✅
-- Block breaking (left click in break mode)
-- Block placing (right click in place mode)
-- Day/night cycle with dynamic lighting
-- Stars at night
-- Building materials (9 block types)
-
-### Phase 3: Vehicles ✅
-- 5 vehicle types (Sedan, Sports, SUV, Motorcycle, Helicopter)
-- Driving physics
-- Enter/exit vehicles (F key)
-- Engine sounds
-
-### Phase 4: Combat & Wanted System ✅
-- 4 weapons (Fists, Pistol, Shotgun, Rifle)
-- NPC cops and civilians
-- Wanted level system (1-5 stars)
-- Police pursuit AI
-
-### Phase 5: Missions & Economy ✅
-- 6 missions (Explore, Race, Heist, Survival, Delivery, Collection)
-- Cash rewards
-- XP & leveling system
-- Black market shop
-
-### Phase 6: Polish ✅
-- Audio system (footsteps, gunshots, engine sounds)
-- Particle effects
-- Performance optimization
-
-### Firebase Integration 🔥
-- Google Sign-in
-- Player data persistence
-- Cash & inventory saved
-- Leaderboards ready
-- Multiplayer sync ready
+| Feature | Status |
+|---------|--------|
+| Voxel world + procedural city | ✅ |
+| Player movement (WASD, Jump, Sprint) | ✅ |
+| Block breaking/placing system | ✅ |
+| Day/night cycle + stars | ✅ |
+| 5 vehicle types (Sedan, Sports, SUV, Motorcycle, Helicopter) | ✅ |
+| Combat + wanted level (1-5 stars) | ✅ |
+| 6 missions with rewards | ✅ |
+| Black Market shop | ✅ |
+| Audio system (footsteps, gunshots, engine) | ✅ |
+| **Supabase Auth + Database** | ✅ |
 
 ## 🛠️ Tech Stack
 
@@ -85,8 +55,8 @@ npm run dev
 |------------|---------|
 | Three.js | 3D WebGL rendering |
 | Vite | Fast dev server & build |
-| Firebase Auth | User authentication |
-| Firestore | Cloud database |
+| **Supabase** | Auth + Database (Firebase alternative) |
+| GitHub Actions | Auto-deploy to GitHub Pages |
 
 ## 📁 Project Structure
 
@@ -94,38 +64,39 @@ npm run dev
 voxel-crime-world/
 ├── src/
 │   ├── main.js              # Game entry & systems
-│   ├── style.css            # UI styling
-│   ├── firebase/
-│   │   └── config.js        # Firebase setup
+│   ├── supabase/
+│   │   └── config.js        # Supabase setup
 │   ├── world/
-│   │   ├── World.js         # World manager
-│   │   ├── Chunk.js         # Voxel chunks
-│   │   ├── Generator.js     # Procedural generation
-│   │   ├── BuildingSystem.js # Block placing/breaking
-│   │   └── DayNightCycle.js # Dynamic lighting
-│   ├── player/
-│   │   └── Player.js        # Player controller
-│   ├── vehicles/
-│   │   └── VehicleManager.js # Vehicle system
-│   ├── combat/
-│   │   └── CombatSystem.js  # Combat & wanted level
-│   ├── missions/
-│   │   └── MissionSystem.js # Mission & economy
-│   ├── ui/
-│   │   ├── HUD.js           # Heads-up display
-│   │   ├── ShopSystem.js    # Black market shop
-│   │   └── Auth.js          # Login screen
-│   └── audio/
-│       └── AudioManager.js  # Sound effects
-└── ...
+│   │   ├── World.js, Chunk.js, Generator.js
+│   │   ├── BuildingSystem.js
+│   │   └── DayNightCycle.js
+│   ├── vehicles/VehicleManager.js
+│   ├── combat/CombatSystem.js
+│   ├── missions/MissionSystem.js
+│   ├── ui/HUD.js, ShopSystem.js, Auth.js
+│   └── audio/AudioManager.js
+├── SUPABASE_SETUP.md        # Database setup guide
+├── package.json
+└── vite.config.js
 ```
 
-## 🔧 Firebase Setup
+## 🔧 Supabase Setup
 
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable **Authentication** (Google sign-in)
-3. Enable **Firestore Database**
-4. Copy your config to `src/firebase/config.js`
+1. Create account at [supabase.com](https://supabase.com)
+2. Create new project
+3. Get your **Project URL** and **anon key**
+4. Update `src/supabase/config.js` with your keys
+5. Run the SQL from `SUPABASE_SETUP.md` in your dashboard
+6. Enable Google Auth in Supabase dashboard
+7. Commit & push - auto-deploys!
+
+### Supabase Benefits (vs Firebase):
+- ✅ Open source (no vendor lock-in)
+- ✅ 500MB free database
+- ✅ 50,000 monthly active users
+- ✅ SQL-based (more powerful)
+- ✅ Real-time subscriptions
+- ✅ Self-hostable option
 
 ## 📜 License
 
