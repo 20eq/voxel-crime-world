@@ -1,6 +1,8 @@
 // ============================================
-// AUTH UI - Login/Logout Screen
+// AUTH UI - Login/Logout Screen (Supabase)
 // ============================================
+
+import { supabaseService } from '../supabase/config.js';
 
 export class AuthUI {
   constructor(game) {
@@ -86,9 +88,9 @@ export class AuthUI {
     btn.disabled = true;
 
     try {
-      await this.game.firebaseService.signInWithGoogle();
+      await supabaseService.signInWithGoogle();
+      // Note: Supabase will redirect, so this may not execute
       this.hide();
-      this.game.showNotification('✅ Signed in as ' + this.game.firebaseService.currentUser.displayName);
     } catch (error) {
       btn.textContent = '🔵 Sign in with Google';
       btn.disabled = false;

@@ -13,7 +13,7 @@ import { ShopSystem } from './ui/ShopSystem.js';
 import { AuthUI } from './ui/Auth.js';
 import { HUD } from './ui/HUD.js';
 import { AudioManager } from './audio/AudioManager.js';
-import { firebaseService } from './firebase/config.js';
+import { supabaseService } from './supabase/config.js';
 
 class Game {
   constructor() {
@@ -78,8 +78,8 @@ class Game {
     this.buildingSystem = new BuildingSystem(this.player, this.world);
     this.vehicleManager = new VehicleManager(this.scene, this.player, this.world);
     this.combatSystem = new CombatSystem(this.scene, this.player, this.world);
-    this.missionSystem = new MissionSystem(this.player, firebaseService);
-    this.shopSystem = new ShopSystem(this.player, firebaseService);
+    this.missionSystem = new MissionSystem(this.player, supabaseService);
+    this.shopSystem = new ShopSystem(this.player, supabaseService);
     this.audioManager = new AudioManager();
     this.showLoadingProgress(80);
 
@@ -87,13 +87,14 @@ class Game {
     this.hud = new HUD(this.player);
     this.showLoadingProgress(90);
 
-    // Initialize Firebase Auth
+    // Initialize Supabase Auth
     this.authUI = new AuthUI(this);
-    firebaseService.init({
+    supabaseService.init({
       onLogin: (user, data) => {
         if (data) {
-          this.player.money = data.stats.cash || 5000;
+          this.player.money = data.stats?.cash || 5000;
         }
+        this.showNotification(`✅ Signed in as ${user.email}`);
       },
       onLogout: () => {
         this.showNotification('Signed out');
@@ -200,10 +201,8 @@ class Game {
     switch (e.button) {
       case 0: // Left click
         if (this.player.isInVehicle) {
-          // Shoot while in vehicle
           this.combatSystem.shoot();
         } else {
-          // Building or combat
           if (this.buildingSystem.mode === 'break') {
             this.buildingSystem.breakBlock();
             this.audioManager.play('hit');
@@ -280,7 +279,6 @@ class Game {
     
     document.body.appendChild(notification);
     
-    // Remove after 3 seconds
     setTimeout(() => {
       notification.remove();
     }, 3000);
@@ -357,11 +355,9 @@ class Game {
 
     const delta = Math.min(this.clock.getDelta(), 0.1);
 
-    // Update player
     if (this.player) {
       this.player.update(delta);
       
-      // Update camera for vehicle
       if (this.player.isInVehicle) {
         const vehicle = this.player.currentVehicle;
         this.camera.position.copy(vehicle.position).add(new THREE.Vector3(0, 3, 0));
@@ -369,44 +365,17 @@ class Game {
       }
     }
 
-    // Update world
     if (this.world) {
       this.world.update(this.player.position);
     }
 
-    // Update systems
-    if (this.dayNightCycle) {
-      this.dayNightCycle.update(delta);
-    }
-    
-    if (this.buildingSystem) {
-      this.buildingSystem.update(delta);
-    }
-    
-    if (this.vehicleManager) {
-      this.vehicleManager.update(delta);
-      
-      // Vehicle movement
-      if (this.player.isInVehicle && this.player.isLocked) {
-        const vehicle = this.player.currentVehicle;
-        this.updateVehicleControls(vehicle, delta);
-      }
-    }
-    
-    if (this.combatSystem) {
-      this.combatSystem.update(delta);
-    }
-    
-    if (this.audioManager) {
-      this.audioManager.update(delta);
-    }
+    if (this.dayNightCycle) this.dayNightCycle.update(delta);
+    if (this.buildingSystem) this.buildingSystem.update(delta);
+    if (this.vehicleManager) this.vehicleManager.update(delta);
+    if (this.combatSystem) this.combatSystem.update(delta);
+    if (this.audioManager) this.audioManager.update(delta);
+    if (this.hud) this.hud.update();
 
-    // Update HUD
-    if (this.hud) {
-      this.hud.update();
-    }
-
-    // Render
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -415,7 +384,6 @@ class Game {
     const friction = 0.98;
     const turnSpeed = 2;
 
-    // Acceleration
     if (this.player.keys.forward) {
       vehicle.speed = Math.min(vehicle.speed + acceleration * delta, vehicle.maxSpeed);
     }
@@ -423,38 +391,26 @@ class Game {
       vehicle.speed = Math.max(vehicle.speed - acceleration * delta * 1.5, -vehicle.maxSpeed / 2);
     }
 
-    // Friction
     vehicle.speed *= friction;
 
-    // Turning
     if (Math.abs(vehicle.speed) > 0.5) {
-      if (this.player.keys.left) {
-        vehicle.rotation += turnSpeed * delta * (vehicle.speed > 0 ? 1 : -1);
-      }
-      if (this.player.keys.right) {
-        vehicle.rotation -= turnSpeed * delta * (vehicle.speed > 0 ? 1 : -1);
-      }
+      if (this.player.keys.left) vehicle.rotation += turnSpeed * delta * (vehicle.speed > 0 ? 1 : -1);
+      if (this.player.keys.right) vehicle.rotation -= turnSpeed * delta * (vehicle.speed > 0 ? 1 : -1);
     }
 
-    // Apply movement
     vehicle.position.x += Math.sin(vehicle.rotation) * vehicle.speed * delta;
     vehicle.position.z += Math.cos(vehicle.rotation) * vehicle.speed * delta;
     
-    // Update mesh
     vehicle.group.position.copy(vehicle.position);
     vehicle.group.rotation.y = vehicle.rotation;
     
-    // Play engine sound
     if (Math.abs(vehicle.speed) > 1) {
       this.audioManager.play('engine', Math.abs(vehicle.speed) / vehicle.maxSpeed * 0.3);
     }
   }
 }
 
-// ============================================
-// ENHANCED PLAYER CLASS
-// ============================================
-
+// Player class
 class Player {
   constructor(camera, world) {
     this.camera = camera;
@@ -620,12 +576,8 @@ class Player {
   }
 }
 
-// ============================================
-// START GAME
-// ============================================
-
+// Start game
 document.addEventListener('DOMContentLoaded', () => {
-  // Add notification animation styles
   const style = document.createElement('style');
   style.textContent = `
     @keyframes slideIn {
