@@ -47,13 +47,8 @@ export class SupabaseService {
   }
 
   async signOut() {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      console.log('👋 Signed out');
-    } catch (error) {
-      console.error('❌ Sign out failed:', error.message);
-    }
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error('❌ Sign out failed:', error.message);
   }
 
   async loadUserData() {
@@ -66,25 +61,20 @@ export class SupabaseService {
       .single();
 
     if (error && error.code === 'PGRST116') {
-      this.userData = {
+      // Create new user
+      const { error: insertError } = await supabase.from('users').insert({
         id: this.currentUser.id,
         username: this.currentUser.user_metadata?.full_name || this.currentUser.email,
         email: this.currentUser.email,
         avatar_url: this.currentUser.user_metadata?.avatar_url,
-        created_at: new Date().toISOString(),
-        stats: {
-          level: 1, xp: 0, cash: 5000, kills: 0, deaths: 0, missionsCompleted: 0, playTime: 0
-        },
-        inventory: {
-          weapons: ['Fists', 'Pistol'],
-          vehicles: ['Sedan'],
-          properties: []
-        },
-        settings: {
-          sensitivity: 1.0, musicVolume: 0.7, sfxVolume: 1.0
-        }
-      };
-      await this.saveUserData(this.userData);
+        stats: { level: 1, xp: 0, cash: 5000, kills: 0, deaths: 0, missionsCompleted: 0, playTime: 0 }
+      });
+      if (!insertError) {
+        this.userData = {
+          id: this.currentUser.id,
+          stats: { level: 1, xp: 0, cash: 5000, kills: 0, deaths: 0, missionsCompleted: 0, playTime: 0 }
+        };
+      }
     } else if (!error) {
       this.userData = data;
     }
@@ -100,20 +90,34 @@ export class SupabaseService {
 
   async updateStats(stats) {
     if (!this.userData) return;
-    await this.saveUserData({ stats: { ...this.userData.stats, ...stats } });
+    const newStats = { ...this.userData.stats, ...stats };
+    await this.saveUserData({ stats: newStats });
   }
 
   async addCash(amount) {
     if (!this.userData) return 0;
-    const newCash = (this.userData.stats.cash || 0) + amount;
+    const newCash = (this.userData.stats?.cash || 0) + amount;
     await this.updateStats({ cash: newCash });
     return newCash;
   }
 
-  async spendCash(amount) {
-    if (!this.userData || this.userData.stats.cash < amount) return false;
-    await this.updateStats({ cash: this.userData.stats.cash - amount });
-    return true;
+  async saveGameState(state) {
+    if (!this.currentUser) return;
+    await supabase.from('game_states').upsert({
+      user_id: this.currentUser.id,
+      ...state,
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  async loadGameState() {
+    if (!this.currentUser) return null;
+    const { data } = await supabase
+      .from('game_states')
+      .select('*')
+      .eq('user_id', this.currentUser.id)
+      .single();
+    return data;
   }
 
   async getLeaderboard(type = 'kills', limitCount = 10) {
@@ -130,30 +134,11 @@ export class SupabaseService {
     if (!this.currentUser) return;
     await supabase.from('leaderboard').upsert({
       user_id: this.currentUser.id,
-      username: this.currentUser.user_metadata?.full_name || 'Unknown',
+      username: this.userData?.username || 'Player',
       type: type,
       value: value,
       created_at: new Date().toISOString()
-    });
-  }
-
-  async saveGameState(gameState) {
-    if (!this.currentUser) return;
-    await supabase.from('game_states').upsert({
-      user_id: this.currentUser.id,
-      ...gameState,
-      updated_at: new Date().toISOString()
-    });
-  }
-
-  async loadGameState() {
-    if (!this.currentUser) return null;
-    const { data } = await supabase
-      .from('game_states')
-      .select('*')
-      .eq('user_id', this.currentUser.id)
-      .single();
-    return data;
+    }, { onConflict: 'user_id,type' });
   }
 }
 

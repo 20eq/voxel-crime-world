@@ -1,20 +1,17 @@
-# 🎮 VoxelCrime World - Complete Edition
+# 🎮 VoxelCrime World
 
-> Open-world voxel game mixing Minecraft's building, GTA's action, and Ananta's features. Now with **Supabase** (open-source Firebase alternative)!
+> Open-world voxel game mixing Minecraft's building, GTA's action, and Ananta's features.
 
 ![VoxelCrime World](https://via.placeholder.com/800x400/1a1a2e/ffd93d?text=VoxelCrime+World)
 
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Open http://localhost:5173 in your browser
 ```
+
+Open http://localhost:5173 in your browser.
 
 ## 🎮 Controls
 
@@ -26,12 +23,11 @@ npm run dev
 | Mouse | Look |
 | Left Click | Attack / Break block |
 | Right Click | Place block |
-| E | Interact |
 | F | Enter/Exit vehicle |
 | B | Toggle build mode |
 | K | Open shop |
 | M | View missions |
-| 1-5 | Select hotbar item |
+| 1-5 | Select weapon |
 | ESC | Unlock mouse |
 
 ## 🔥 Features
@@ -42,62 +38,42 @@ npm run dev
 | Player movement (WASD, Jump, Sprint) | ✅ |
 | Block breaking/placing system | ✅ |
 | Day/night cycle + stars | ✅ |
-| 5 vehicle types (Sedan, Sports, SUV, Motorcycle, Helicopter) | ✅ |
+| 5 vehicle types | ✅ |
 | Combat + wanted level (1-5 stars) | ✅ |
 | 6 missions with rewards | ✅ |
 | Black Market shop | ✅ |
-| Audio system (footsteps, gunshots, engine) | ✅ |
-| **Supabase Auth + Database** | ✅ |
+| Audio system | ✅ |
+| Supabase Auth + Database | ✅ |
+| Cloud saves | ✅ |
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| Three.js | 3D WebGL rendering |
-| Vite | Fast dev server & build |
-| **Supabase** | Auth + Database (Firebase alternative) |
-| GitHub Actions | Auto-deploy to GitHub Pages |
+- **Three.js** - 3D rendering
+- **Vite** - Build tool
+- **Supabase** - Auth + Database
+- **GitHub Actions** - Auto-deploy
+
+## 🔗 Live Game
+
+**https://20eq.github.io/voxel-crime-world**
 
 ## 📁 Project Structure
 
 ```
 voxel-crime-world/
 ├── src/
-│   ├── main.js              # Game entry & systems
-│   ├── supabase/
-│   │   └── config.js        # Supabase setup
-│   ├── world/
-│   │   ├── World.js, Chunk.js, Generator.js
-│   │   ├── BuildingSystem.js
-│   │   └── DayNightCycle.js
-│   ├── vehicles/VehicleManager.js
-│   ├── combat/CombatSystem.js
-│   ├── missions/MissionSystem.js
-│   ├── ui/HUD.js, ShopSystem.js, Auth.js
-│   └── audio/AudioManager.js
-├── SUPABASE_SETUP.md        # Database setup guide
+│   ├── main.js              # Game entry
+│   ├── supabase/config.js   # Supabase setup
+│   ├── world/               # Voxel world system
+│   ├── vehicles/            # Vehicle system
+│   ├── combat/              # Combat system
+│   ├── missions/            # Mission system
+│   ├── ui/                  # UI components
+│   └── audio/               # Audio system
 ├── package.json
 └── vite.config.js
 ```
 
-## 🔧 Supabase Setup
+---
 
-1. Create account at [supabase.com](https://supabase.com)
-2. Create new project
-3. Get your **Project URL** and **anon key**
-4. Update `src/supabase/config.js` with your keys
-5. Run the SQL from `SUPABASE_SETUP.md` in your dashboard
-6. Enable Google Auth in Supabase dashboard
-7. Commit & push - auto-deploys!
-
-### Supabase Benefits (vs Firebase):
-- ✅ Open source (no vendor lock-in)
-- ✅ 500MB free database
-- ✅ 50,000 monthly active users
-- ✅ SQL-based (more powerful)
-- ✅ Real-time subscriptions
-- ✅ Self-hostable option
-
-## 📜 License
-
-MIT License - Built with ❤️ for gamers everywhere
+*Built with ❤️*
